@@ -12,12 +12,18 @@ const Header = () => {
           </div>
           
           <nav className="hidden md:flex items-center space-x-6">
-            <a href="#projects" className="text-muted-foreground hover:text-primary transition-colors">
+            <button 
+              onClick={() => document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' })}
+              className="text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+            >
               Projects
-            </a>
-            <a href="#vote" className="text-muted-foreground hover:text-primary transition-colors">
+            </button>
+            <button 
+              onClick={() => document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' })}
+              className="text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+            >
               Community Vote
-            </a>
+            </button>
             <a href="#about" className="text-muted-foreground hover:text-primary transition-colors">
               About
             </a>
