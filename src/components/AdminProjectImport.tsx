@@ -157,31 +157,46 @@ const AdminProjectImport = () => {
   });
 
   const parseCSV = (csv: string): CSVProject[] => {
-    const lines = csv.trim().split('\n');
-    const headers = lines[0].split('\t').map(h => h.trim()); // Use tab separator for Google Sheets
+    console.log("Raw CSV data:", csv.substring(0, 200)); // Debug: first 200 chars
     
-    return lines.slice(1).map(line => {
-      const values = line.split('\t').map(v => v.trim().replace(/^"|"$/g, ''));
-      const project: any = {};
+    const lines = csv.trim().split('\n');
+    console.log("Number of lines:", lines.length);
+    console.log("First line (headers):", lines[0]);
+    
+    // Try both tab and comma separators
+    const firstLine = lines[0];
+    const separator = firstLine.includes('\t') ? '\t' : ',';
+    console.log("Using separator:", separator === '\t' ? 'TAB' : 'COMMA');
+    
+    const headers = firstLine.split(separator).map(h => h.trim());
+    console.log("Headers found:", headers);
+    
+    const projects = lines.slice(1).map((line, index) => {
+      const values = line.split(separator).map(v => v.trim().replace(/^"|"$/g, ''));
+      console.log(`Line ${index + 1} values:`, values);
       
-      headers.forEach((header, index) => {
-        project[header] = values[index] || '';
+      const project: any = {};
+      headers.forEach((header, headerIndex) => {
+        project[header] = values[headerIndex] || '';
       });
       
+      console.log("Project object:", project);
+      
       // Map Google Forms columns to our fields
-      const teamName = project["What's the Name of your Project / Team?"] || '';
-      const teamMembers = [
-        project["What's your Name?"] || '',
-        project["Who else is part of your Team?"] || ''
-      ].filter(name => name.trim() !== '').join(', ');
+      const teamName = project["What's the Name of your Project / Team?"] || 
+                      project["What's the Name of your Project / Team?"] || // In case of encoding issues
+                      '';
       
-      const description = [
-        project["What problem(s) is your project adressing / solving?"] || '',
-        project["What solution(s) do you propose?"] || '',
-        project["Who is your target audience / users?"] || ''
-      ].filter(desc => desc.trim() !== '').join(' | ');
+      const name1 = project["What's your Name?"] || '';
+      const otherMembers = project["Who else is part of your Team?"] || '';
+      const teamMembers = [name1, otherMembers].filter(name => name.trim() !== '').join(', ');
       
-      return {
+      const problem = project["What problem(s) is your project adressing / solving?"] || '';
+      const solution = project["What solution(s) do you propose?"] || '';
+      const audience = project["Who is your target audience / users?"] || '';
+      const description = [problem, solution, audience].filter(desc => desc.trim() !== '').join(' | ');
+      
+      const result = {
         name: teamName,
         description: description,
         team_members: teamMembers,
@@ -189,7 +204,13 @@ const AdminProjectImport = () => {
         demo_url: '',
         video_url: '',
       };
+      
+      console.log("Mapped project:", result);
+      return result;
     }).filter(project => project.name.trim() !== '');
+    
+    console.log("Final projects after filtering:", projects);
+    return projects;
   };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
