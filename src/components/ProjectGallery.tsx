@@ -1,13 +1,22 @@
+import { useState } from "react";
 import ProjectCard from "./ProjectCard";
+import { ProjectDetailModal } from "./ProjectDetailModal";
 import { useProjects, useVoteForProject } from "@/hooks/useProjects";
 import { Loader2, Trophy } from "lucide-react";
 
 const ProjectGallery = () => {
   const { data: projects, isLoading, error } = useProjects();
   const voteForProject = useVoteForProject();
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const handleVote = (projectId: string) => {
     voteForProject.mutate(projectId);
+  };
+
+  const handleViewDetails = (project: any) => {
+    setSelectedProject(project);
+    setModalOpen(true);
   };
 
   if (isLoading) {
@@ -55,10 +64,17 @@ const ProjectGallery = () => {
               key={project.id}
               project={project}
               onVote={handleVote}
+              onViewDetails={handleViewDetails}
               showVoting={true}
             />
           ))}
         </div>
+
+        <ProjectDetailModal
+          project={selectedProject}
+          open={modalOpen}
+          onOpenChange={setModalOpen}
+        />
 
         {projects && projects.length === 0 && (
           <div className="text-center py-12">

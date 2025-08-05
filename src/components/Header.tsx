@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Gavel, Users, Vote, Settings } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   return (
@@ -30,9 +31,11 @@ const Header = () => {
           </nav>
 
           <div className="flex items-center space-x-3">
-            <Button variant="outline" size="sm">
-              <Users className="h-4 w-4 mr-2" />
-              Judge Portal
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/judge">
+                <Users className="h-4 w-4 mr-2" />
+                Judge Portal
+              </Link>
             </Button>
             <Button variant="admin" size="sm" asChild>
               <a href="/admin">

@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Heart, ExternalLink, Github, Play, Users } from "lucide-react";
+import { Heart, ExternalLink, Github, Play, Users, Eye } from "lucide-react";
 import { useState } from "react";
 
 interface ProjectCardProps {
@@ -16,10 +16,11 @@ interface ProjectCardProps {
     votes?: number;
   };
   onVote?: (projectId: string) => void;
+  onViewDetails?: (project: any) => void;
   showVoting?: boolean;
 }
 
-const ProjectCard = ({ project, onVote, showVoting = true }: ProjectCardProps) => {
+const ProjectCard = ({ project, onVote, onViewDetails, showVoting = true }: ProjectCardProps) => {
   const [hasVoted, setHasVoted] = useState(false);
   const [voteCount, setVoteCount] = useState(project.votes || 0);
 
@@ -97,7 +98,12 @@ const ProjectCard = ({ project, onVote, showVoting = true }: ProjectCardProps) =
           )}
         </div>
         
-        <Button variant="outline" size="sm">
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={() => onViewDetails?.(project)}
+        >
+          <Eye className="h-4 w-4 mr-1" />
           View Details
         </Button>
       </CardFooter>
