@@ -119,6 +119,109 @@ export type Database = {
         }
         Relationships: []
       }
+      community_votes: {
+        Row: {
+          id: string
+          ip_address: unknown | null
+          project_id: string | null
+          timestamp: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          id?: string
+          ip_address?: unknown | null
+          project_id?: string | null
+          timestamp?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          id?: string
+          ip_address?: unknown | null
+          project_id?: string | null
+          timestamp?: string | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_votes_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      criteria: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          event_id: string | null
+          id: string
+          max_score: number | null
+          name: string
+          weight: number
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          event_id?: string | null
+          id?: string
+          max_score?: number | null
+          name: string
+          weight?: number
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          event_id?: string | null
+          id?: string
+          max_score?: number | null
+          name?: string
+          weight?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "criteria_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          end_date: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          start_date: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          start_date?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          start_date?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       game_state: {
         Row: {
           current_question_id: number | null
@@ -202,6 +305,47 @@ export type Database = {
           volatility_bucket?: string | null
         }
         Relationships: []
+      }
+      judges: {
+        Row: {
+          auth_token: string | null
+          created_at: string | null
+          email: string
+          event_id: string | null
+          id: string
+          invitation_status: string | null
+          name: string
+          token_expires_at: string | null
+        }
+        Insert: {
+          auth_token?: string | null
+          created_at?: string | null
+          email: string
+          event_id?: string | null
+          id?: string
+          invitation_status?: string | null
+          name: string
+          token_expires_at?: string | null
+        }
+        Update: {
+          auth_token?: string | null
+          created_at?: string | null
+          email?: string
+          event_id?: string | null
+          id?: string
+          invitation_status?: string | null
+          name?: string
+          token_expires_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "judges_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       luxdrop_boxes: {
         Row: {
@@ -292,6 +436,56 @@ export type Database = {
           username?: string
         }
         Relationships: []
+      }
+      projects: {
+        Row: {
+          created_at: string | null
+          demo_url: string | null
+          description: string | null
+          event_id: string | null
+          github_url: string | null
+          google_sheet_row_id: string | null
+          id: string
+          name: string
+          team_members: Json | null
+          updated_at: string | null
+          video_url: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          demo_url?: string | null
+          description?: string | null
+          event_id?: string | null
+          github_url?: string | null
+          google_sheet_row_id?: string | null
+          id?: string
+          name: string
+          team_members?: Json | null
+          updated_at?: string | null
+          video_url?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          demo_url?: string | null
+          description?: string | null
+          event_id?: string | null
+          github_url?: string | null
+          google_sheet_row_id?: string | null
+          id?: string
+          name?: string
+          team_members?: Json | null
+          updated_at?: string | null
+          video_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "projects_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       questions: {
         Row: {
@@ -385,6 +579,58 @@ export type Database = {
           volatility_bucket?: string | null
         }
         Relationships: []
+      }
+      scores: {
+        Row: {
+          comments: string | null
+          criterion_id: string | null
+          id: string
+          judge_id: string | null
+          project_id: string | null
+          score_value: number
+          submitted_at: string | null
+        }
+        Insert: {
+          comments?: string | null
+          criterion_id?: string | null
+          id?: string
+          judge_id?: string | null
+          project_id?: string | null
+          score_value: number
+          submitted_at?: string | null
+        }
+        Update: {
+          comments?: string | null
+          criterion_id?: string | null
+          id?: string
+          judge_id?: string | null
+          project_id?: string | null
+          score_value?: number
+          submitted_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scores_criterion_id_fkey"
+            columns: ["criterion_id"]
+            isOneToOne: false
+            referencedRelation: "criteria"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "scores_judge_id_fkey"
+            columns: ["judge_id"]
+            isOneToOne: false
+            referencedRelation: "judges"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "scores_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
