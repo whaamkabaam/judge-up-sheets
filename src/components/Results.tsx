@@ -100,7 +100,7 @@ export const Results = () => {
         return {
           project_id: project.id,
           project_name: project.name,
-          team_members: Array.isArray(project.team_members) ? project.team_members : [],
+          team_members: Array.isArray(project.team_members) ? project.team_members.map(member => String(member)) : [],
           weighted_score: weightedScore * 100, // Convert to percentage
           total_votes: projectVotes,
           criteria_scores: avgCriteriaScores,
