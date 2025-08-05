@@ -158,26 +158,38 @@ const AdminProjectImport = () => {
 
   const parseCSV = (csv: string): CSVProject[] => {
     const lines = csv.trim().split('\n');
-    const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+    const headers = lines[0].split('\t').map(h => h.trim()); // Use tab separator for Google Sheets
     
     return lines.slice(1).map(line => {
-      const values = line.split(',').map(v => v.trim().replace(/^"|"$/g, ''));
+      const values = line.split('\t').map(v => v.trim().replace(/^"|"$/g, ''));
       const project: any = {};
       
       headers.forEach((header, index) => {
-        const cleanHeader = header.replace(/[^a-z_]/g, '_');
-        project[cleanHeader] = values[index] || '';
+        project[header] = values[index] || '';
       });
       
+      // Map Google Forms columns to our fields
+      const teamName = project["What's the Name of your Project / Team?"] || '';
+      const teamMembers = [
+        project["What's your Name?"] || '',
+        project["Who else is part of your Team?"] || ''
+      ].filter(name => name.trim() !== '').join(', ');
+      
+      const description = [
+        project["What problem(s) is your project adressing / solving?"] || '',
+        project["What solution(s) do you propose?"] || '',
+        project["Who is your target audience / users?"] || ''
+      ].filter(desc => desc.trim() !== '').join(' | ');
+      
       return {
-        name: project.name || project.project_name || '',
-        description: project.description || project.project_description || '',
-        team_members: project.team_members || project.team || project.members || '',
-        github_url: project.github_url || project.github || project.repository || '',
-        demo_url: project.demo_url || project.demo || project.live_url || '',
-        video_url: project.video_url || project.video || project.presentation || '',
+        name: teamName,
+        description: description,
+        team_members: teamMembers,
+        github_url: '',
+        demo_url: '',
+        video_url: '',
       };
-    });
+    }).filter(project => project.name.trim() !== '');
   };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
