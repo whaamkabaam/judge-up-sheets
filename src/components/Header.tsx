@@ -28,9 +28,11 @@ const Header = () => {
               <Users className="h-4 w-4 mr-2" />
               Judge Portal
             </Button>
-            <Button variant="admin" size="sm">
-              <Settings className="h-4 w-4 mr-2" />
-              Admin
+            <Button variant="admin" size="sm" asChild>
+              <a href="/admin">
+                <Settings className="h-4 w-4 mr-2" />
+                Admin
+              </a>
             </Button>
           </div>
         </div>
