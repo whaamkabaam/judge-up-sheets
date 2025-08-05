@@ -157,41 +157,58 @@ const AdminProjectImport = () => {
   });
 
   const parseCSV = (csv: string): CSVProject[] => {
-    console.log("Raw CSV data:", csv.substring(0, 200)); // Debug: first 200 chars
+    console.log("Raw CSV data:", csv.substring(0, 500)); // Debug: first 500 chars
+    
+    // Proper CSV parsing that handles quoted fields with commas
+    const parseCSVLine = (line: string): string[] => {
+      const result = [];
+      let current = '';
+      let inQuotes = false;
+      
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        if (char === '"') {
+          inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+          result.push(current.trim());
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+      result.push(current.trim());
+      return result;
+    };
     
     const lines = csv.trim().split('\n');
     console.log("Number of lines:", lines.length);
-    console.log("First line (headers):", lines[0]);
     
-    // Try both tab and comma separators
-    const firstLine = lines[0];
-    const separator = firstLine.includes('\t') ? '\t' : ',';
-    console.log("Using separator:", separator === '\t' ? 'TAB' : 'COMMA');
-    
-    const headers = firstLine.split(separator).map(h => h.trim());
+    const headers = parseCSVLine(lines[0]);
     console.log("Headers found:", headers);
     
     const projects = lines.slice(1).map((line, index) => {
-      const values = line.split(separator).map(v => v.trim().replace(/^"|"$/g, ''));
-      console.log(`Line ${index + 1} values:`, values);
+      if (!line.trim()) return null; // Skip empty lines
+      
+      const values = parseCSVLine(line);
+      console.log(`Line ${index + 1} values:`, values.length, "values");
       
       const project: any = {};
       headers.forEach((header, headerIndex) => {
         project[header] = values[headerIndex] || '';
       });
       
-      console.log("Project object:", project);
+      console.log("Raw project data:", Object.keys(project));
       
-      // Map Google Forms columns to our fields
-      const teamName = project["What's the Name of your Project / Team?"] || 
-                      project["What's the Name of your Project / Team?"] || // In case of encoding issues
-                      '';
+      // Map Google Forms columns to our fields (handling both spellings)
+      const teamName = project["What's the Name of your Project / Team?"] || '';
       
       const name1 = project["What's your Name?"] || '';
       const otherMembers = project["Who else is part of your Team?"] || '';
       const teamMembers = [name1, otherMembers].filter(name => name.trim() !== '').join(', ');
       
-      const problem = project["What problem(s) is your project adressing / solving?"] || '';
+      // Handle both "addressing" and "adressing" spellings
+      const problem = project["What problem(s) is your project addressing / solving?"] || 
+                     project["What problem(s) is your project adressing / solving?"] || '';
       const solution = project["What solution(s) do you propose?"] || '';
       const audience = project["Who is your target audience / users?"] || '';
       const description = [problem, solution, audience].filter(desc => desc.trim() !== '').join(' | ');
@@ -207,7 +224,7 @@ const AdminProjectImport = () => {
       
       console.log("Mapped project:", result);
       return result;
-    }).filter(project => project.name.trim() !== '');
+    }).filter(project => project && project.name.trim() !== '');
     
     console.log("Final projects after filtering:", projects);
     return projects;
