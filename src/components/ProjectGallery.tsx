@@ -3,6 +3,8 @@ import ProjectCard from "./ProjectCard";
 import { ProjectDetailModal } from "./ProjectDetailModal";
 import { useProjects, useVoteForProject } from "@/hooks/useProjects";
 import { Loader2, Trophy } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const ProjectGallery = () => {
   const { data: projects, isLoading, error } = useProjects();
