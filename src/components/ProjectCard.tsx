@@ -15,20 +15,23 @@ interface ProjectCardProps {
     video_url?: string;
     votes?: number;
   };
-  onVote?: (projectId: string) => void;
+  onVote?: (projectId: string) => Promise<void>;
   onViewDetails?: (project: any) => void;
   showVoting?: boolean;
 }
 
 const ProjectCard = ({ project, onVote, onViewDetails, showVoting = true }: ProjectCardProps) => {
   const [hasVoted, setHasVoted] = useState(false);
-  const [voteCount, setVoteCount] = useState(project.votes || 0);
+  const [isVoting, setIsVoting] = useState(false);
 
-  const handleVote = () => {
-    if (!hasVoted && onVote) {
-      onVote(project.id);
+  const handleVote = async () => {
+    if (hasVoted || !onVote) return;
+    try {
+      setIsVoting(true);
+      await onVote(project.id);
       setHasVoted(true);
-      setVoteCount(prev => prev + 1);
+    } finally {
+      setIsVoting(false);
     }
   };
 
@@ -44,11 +47,11 @@ const ProjectCard = ({ project, onVote, onViewDetails, showVoting = true }: Proj
               variant={hasVoted ? "secondary" : "vote"}
               size="sm"
               onClick={handleVote}
-              disabled={hasVoted}
+              disabled={hasVoted || isVoting}
               className="flex items-center space-x-1"
             >
               <Heart className={`h-4 w-4 ${hasVoted ? 'fill-current' : ''}`} />
-              <span>{voteCount}</span>
+              <span>{project.votes ?? 0}</span>
             </Button>
           )}
         </div>

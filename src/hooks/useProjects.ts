@@ -55,7 +55,6 @@ export const useVoteForProject = () => {
         .from("community_votes")
         .insert({
           project_id: projectId,
-          ip_address: null, // Will be populated by database
           user_agent: navigator.userAgent
         });
 
@@ -74,11 +73,21 @@ export const useVoteForProject = () => {
       queryClient.invalidateQueries({ queryKey: ["projects"] });
     },
     onError: (error: any) => {
-      toast({
-        title: "Vote failed",
-        description: error.message || "Failed to submit vote. Please try again.",
-        variant: "destructive",
-      });
+      const code = error?.code || error?.details?.code;
+      const message = error?.message || "";
+      if (code === "23505" || message.toLowerCase().includes("duplicate") || message.includes("uniq_community_votes_project_ip")) {
+        toast({
+          title: "Already voted",
+          description: "This IP has already voted for this project.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Vote failed",
+          description: message || "Failed to submit vote. Please try again.",
+          variant: "destructive",
+        });
+      }
     },
   });
 };

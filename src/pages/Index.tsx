@@ -8,7 +8,7 @@ const Index = () => {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "JudgeUp",
+    name: "SummerUp Community Vote",
     url: canonicalUrl,
     potentialAction: {
       "@type": "SearchAction",
@@ -19,11 +19,11 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
-        <title>JudgeUp — Hackathon Judging & Community Voting</title>
-        <meta name="description" content="JudgeUp makes hackathon judging and community voting simple. Explore projects, invite judges, and track results." />
+        <title>SummerUp 2025 — Community Project Voting</title>
+        <meta name="description" content="Cast your vote for the SummerUp 2025 Community Choice Award. Browse projects and pick your favorites." />
         <link rel="canonical" href={canonicalUrl} />
-        <meta property="og:title" content="JudgeUp — Hackathon Judging & Community Voting" />
-        <meta property="og:description" content="JudgeUp makes hackathon judging and community voting simple. Explore projects, invite judges, and track results." />
+        <meta property="og:title" content="SummerUp 2025 — Community Project Voting" />
+        <meta property="og:description" content="Cast your vote for the SummerUp 2025 Community Choice Award. Browse projects and pick your favorites." />
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
       </Helmet>
       <Header />

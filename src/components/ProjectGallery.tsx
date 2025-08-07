@@ -14,8 +14,8 @@ const ProjectGallery = () => {
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<"name" | "votes" | "recent">("name");
 
-  const handleVote = (projectId: string) => {
-    voteForProject.mutate(projectId);
+  const handleVote = async (projectId: string) => {
+    await voteForProject.mutateAsync(projectId);
   };
 
   const handleViewDetails = (project: any) => {
