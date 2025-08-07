@@ -649,6 +649,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      get_ip_vote_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
       increment_player_score: {
         Args: { player_session_id: string; score_to_add: number }
         Returns: undefined
