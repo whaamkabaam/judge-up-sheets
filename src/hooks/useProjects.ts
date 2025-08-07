@@ -71,11 +71,27 @@ export const useVoteForProject = () => {
         description: "Thank you for participating in the community vote.",
       });
       queryClient.invalidateQueries({ queryKey: ["projects"] });
+      queryClient.invalidateQueries({ queryKey: ["ipVoteStats"] });
     },
     onError: (error: any) => {
       const code = error?.code || error?.details?.code;
-      const message = error?.message || "";
-      if (code === "23505" || message.toLowerCase().includes("duplicate") || message.includes("uniq_community_votes_project_ip")) {
+      const message = (error?.message || "").toString();
+
+      if (
+        code === "P0001" ||
+        message.toLowerCase().includes("vote limit") ||
+        message.toLowerCase().includes("used all available votes")
+      ) {
+        toast({
+          title: "Vote limit reached",
+          description: "This IP has used all 3 votes.",
+          variant: "destructive",
+        });
+      } else if (
+        code === "23505" ||
+        message.toLowerCase().includes("duplicate") ||
+        message.includes("uniq_community_votes_project_ip")
+      ) {
         toast({
           title: "Already voted",
           description: "This IP has already voted for this project.",

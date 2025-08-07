@@ -5,7 +5,7 @@ import { useProjects, useVoteForProject } from "@/hooks/useProjects";
 import { Loader2, Trophy } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
+import { useVotingStats } from "@/hooks/useVotingStats";
 const ProjectGallery = () => {
   const { data: projects, isLoading, error } = useProjects();
   const voteForProject = useVoteForProject();
@@ -13,6 +13,8 @@ const ProjectGallery = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<"name" | "votes" | "recent">("name");
+
+  const { data: ipStats } = useVotingStats();
 
   const handleVote = async (projectId: string) => {
     await voteForProject.mutateAsync(projectId);
@@ -41,6 +43,9 @@ const ProjectGallery = () => {
     }
     return list;
   }, [projects, search, sortBy]);
+
+  const votedSet = useMemo(() => new Set<string>(ipStats?.projects ?? []), [ipStats]);
+  const votesRemaining = ipStats?.remaining ?? 3;
   if (isLoading) {
     return (
       <section className="py-16 bg-background">
@@ -78,6 +83,11 @@ const ProjectGallery = () => {
             Discover innovative sustainable technology solutions created by talented teams. 
             Vote for your favorite project to support the Community Choice Award!
           </p>
+          <div className="mt-4 inline-flex items-center gap-2 rounded-full px-4 py-2 bg-card text-foreground shadow-elegant">
+            <span className="text-sm font-medium">Votes left:</span>
+            <span className="text-sm font-bold text-primary">{votesRemaining}</span>
+            <span className="text-xs text-muted-foreground">/ 3</span>
+          </div>
         </div>
 
         <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-8">
@@ -110,6 +120,8 @@ const ProjectGallery = () => {
                 onVote={handleVote}
                 onViewDetails={handleViewDetails}
                 showVoting={true}
+                votedByIp={votedSet.has(project.id)}
+                votesRemaining={votesRemaining}
               />
             </div>
           ))}

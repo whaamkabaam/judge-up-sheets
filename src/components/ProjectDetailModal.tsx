@@ -1,9 +1,10 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ExternalLink, Github, Play, Video, Users, Heart } from "lucide-react";
+import { ExternalLink, Github, Play, Video, Users, Heart, Check } from "lucide-react";
 import { useVoteForProject } from "@/hooks/useProjects";
 import type { Project } from "@/hooks/useProjects";
+import { useVotingStats } from "@/hooks/useVotingStats";
 
 interface ProjectDetailModalProps {
   project: Project | null;
@@ -13,10 +14,15 @@ interface ProjectDetailModalProps {
 
 export const ProjectDetailModal = ({ project, open, onOpenChange }: ProjectDetailModalProps) => {
   const voteForProject = useVoteForProject();
+  const { data: ipStats } = useVotingStats();
 
   if (!project) return null;
 
+  const alreadyVoted = !!ipStats?.projects?.includes(project.id);
+  const remaining = ipStats?.remaining ?? 3;
+
   const handleVote = () => {
+    if (alreadyVoted || remaining <= 0) return;
     voteForProject.mutate(project.id);
   };
 
@@ -82,16 +88,26 @@ export const ProjectDetailModal = ({ project, open, onOpenChange }: ProjectDetai
           </div>
 
           {/* Vote Button */}
-          <div className="flex justify-center pt-4 border-t">
+          <div className="flex flex-col items-center justify-center pt-4 border-t gap-2">
             <Button 
               onClick={handleVote} 
-              disabled={voteForProject.isPending}
+              disabled={voteForProject.isPending || alreadyVoted || remaining <= 0}
               size="lg"
-              className="min-w-[200px]"
+              className="min-w-[220px]"
             >
-              <Heart className="mr-2 h-5 w-5" />
-              {voteForProject.isPending ? "Voting..." : "Vote for this Project"}
+              {alreadyVoted ? (
+                <>
+                  <Check className="mr-2 h-5 w-5" />
+                  Already voted
+                </>
+              ) : (
+                <>
+                  <Heart className="mr-2 h-5 w-5" />
+                  {voteForProject.isPending ? "Voting..." : "Vote for this Project"}
+                </>
+              )}
             </Button>
+            <p className="text-xs text-muted-foreground">Votes left: <span className="font-medium">{remaining}</span> / 3</p>
           </div>
 
           {/* Metadata */}

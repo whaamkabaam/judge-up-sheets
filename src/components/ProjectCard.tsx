@@ -18,18 +18,21 @@ interface ProjectCardProps {
   onVote?: (projectId: string) => Promise<void>;
   onViewDetails?: (project: any) => void;
   showVoting?: boolean;
+  votedByIp?: boolean;
+  votesRemaining?: number;
 }
 
-const ProjectCard = ({ project, onVote, onViewDetails, showVoting = true }: ProjectCardProps) => {
-  const [hasVoted, setHasVoted] = useState(false);
+const ProjectCard = ({ project, onVote, onViewDetails, showVoting = true, votedByIp = false }: ProjectCardProps) => {
+  const [localVoted, setLocalVoted] = useState(false);
   const [isVoting, setIsVoting] = useState(false);
+  const hasVoted = votedByIp || localVoted;
 
   const handleVote = async () => {
     if (hasVoted || !onVote) return;
     try {
       setIsVoting(true);
       await onVote(project.id);
-      setHasVoted(true);
+      setLocalVoted(true);
     } finally {
       setIsVoting(false);
     }
@@ -51,7 +54,7 @@ const ProjectCard = ({ project, onVote, onViewDetails, showVoting = true }: Proj
               className="flex items-center space-x-1"
             >
               <Heart className={`h-4 w-4 ${hasVoted ? 'fill-current' : ''}`} />
-              <span>{project.votes ?? 0}</span>
+              <span>{hasVoted ? 'Voted' : (project.votes ?? 0)}</span>
             </Button>
           )}
         </div>
