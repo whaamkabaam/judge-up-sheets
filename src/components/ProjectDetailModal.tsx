@@ -22,9 +22,9 @@ export const ProjectDetailModal = ({ project, open, onOpenChange }: ProjectDetai
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto animate-scale-in">
         <DialogHeader>
-          <DialogTitle className="text-2xl flex items-center gap-3">
+          <DialogTitle className="font-playfair text-2xl flex items-center gap-3">
             {project.name}
             <Badge variant="outline" className="ml-auto">
               {project.votes || 0} votes

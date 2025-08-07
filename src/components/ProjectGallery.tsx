@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import ProjectCard from "./ProjectCard";
 import { ProjectDetailModal } from "./ProjectDetailModal";
 import { useProjects, useVoteForProject } from "@/hooks/useProjects";
@@ -9,6 +9,8 @@ const ProjectGallery = () => {
   const voteForProject = useVoteForProject();
   const [selectedProject, setSelectedProject] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState<"name" | "votes" | "recent">("name");
 
   const handleVote = (projectId: string) => {
     voteForProject.mutate(projectId);
@@ -19,6 +21,24 @@ const ProjectGallery = () => {
     setModalOpen(true);
   };
 
+  const filteredProjects = useMemo(() => {
+    if (!projects) return [] as any[];
+    const term = search.toLowerCase().trim();
+    let list = projects.filter((p: any) => {
+      const inName = p.name?.toLowerCase().includes(term);
+      const inDesc = p.description?.toLowerCase().includes(term);
+      const inTeam = Array.isArray(p.team_members) && p.team_members.join(" ").toLowerCase().includes(term);
+      return !term || inName || inDesc || inTeam;
+    });
+    if (sortBy === "name") {
+      list.sort((a: any, b: any) => a.name.localeCompare(b.name));
+    } else if (sortBy === "votes") {
+      list.sort((a: any, b: any) => (b.votes || 0) - (a.votes || 0));
+    } else if (sortBy === "recent") {
+      list.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    }
+    return list;
+  }, [projects, search, sortBy]);
   if (isLoading) {
     return (
       <section className="py-16 bg-background">
@@ -58,15 +78,38 @@ const ProjectGallery = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {projects?.map((project) => (
-            <ProjectCard
-              key={project.id}
-              project={project}
-              onVote={handleVote}
-              onViewDetails={handleViewDetails}
-              showVoting={true}
+        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-8">
+          <div className="w-full md:w-1/2">
+            <Input
+              placeholder="Search projects, descriptions, or team members"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
             />
+          </div>
+          <div className="w-full md:w-64">
+            <Select value={sortBy} onValueChange={(v) => setSortBy(v as any)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent className="z-50">
+                <SelectItem value="name">Name (A–Z)</SelectItem>
+                <SelectItem value="votes">Most Votes</SelectItem>
+                <SelectItem value="recent">Recently Added</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredProjects.map((project) => (
+            <div key={project.id} className="animate-fade-in">
+              <ProjectCard
+                project={project}
+                onVote={handleVote}
+                onViewDetails={handleViewDetails}
+                showVoting={true}
+              />
+            </div>
           ))}
         </div>
 
